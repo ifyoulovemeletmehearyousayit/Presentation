@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Project S25 Ultra Approval</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette ที่ดู Premium ขึ้น */
+            --primary-bg: #0a0a0a;
+            --accent-blue: #2E93FF;
+            --accent-green: #34C759;
+            --accent-red: #FF3B30;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8E8E93;
+            
+            /* Glassmorphism Variables */
+            --glass-bg: rgba(30, 30, 30, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --blur-amount: 20px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--primary-bg);
+            /* พื้นหลังแบบ Gradient ลึกๆ */
+            background: radial-gradient(circle at top left, #1a2a3a 0%, #000000 100%);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            /* รองรับการเต็มจอใน iOS WebClip */
+            min-height: -webkit-fill-available;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow-y: auto;
+            /* เพิ่ม Padding หลบ Safe Area ของ iPhone */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            box-sizing: border-box;
+            /* ใส่พื้นหลังกระจกฝ้าจางๆ ให้ตัวคอนเทนเนอร์หลัก */
+             backdrop-filter: blur(50px);
+            -webkit-backdrop-filter: blur(50px);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* จัด padding ให้เหมาะกับมือถือ */
+            padding: calc(20px + env(safe-area-inset-top)) 24px calc(40px + env(safe-area-inset-bottom)) 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            /* เปลี่ยนเป็น space-between เพื่อดันปุ่มไปด้านล่างสุดเสมอ */
+            justify-content: space-between; 
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform: translateY(30px) scale(0.95);
+            filter: blur(10px);
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+             filter: blur(0px);
+        }
+        
+        /* Wrapper สำหรับเนื้อหาตรงกลาง เพื่อให้จัด layout กับปุ่มด้านล่างได้ง่าย */
+        .content-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-align: center;
+            /* Gradient Text ที่ดูแพงขึ้น */
+            background: linear-gradient(135deg, #ffffff 0%, #a8a8a8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-weight: 400;
+        }
+
+        /* --- Premium Glass Cards --- */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border: 1px solid var(--glass-border);
+            border-radius: 24px; /* มุมโค้งสไตล์ Apple */
+            padding: 24px;
+            width: 100%;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .role-select {
+            display: flex;
+            flex-direction: column; /* บนมือถือเรียงแนวตั้งกดง่ายกว่า */
+            gap: 12px;
+            width: 100%;
+        }
+
+        /* --- Buttons --- */
+        button {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 100px; /* Pill shape */
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Prompt', sans-serif;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            margin-top: auto; /* ดันปุ่มไปล่างสุดของ slide */
+            box-shadow: 0 4px 15px rgba(46, 147, 255, 0.3);
+            /* ป้องกันการเลือก text บนปุ่มใน iOS */
+            -webkit-touch-callout: none; 
+            user-select: none;
+        }
+
+        button:active {
+            transform: scale(0.97);
+            filter: brightness(0.9);
+        }
+
+        button.outline {
+            background: rgba(46, 147, 255, 0.15);
+            border: 2px solid rgba(46, 147, 255, 0.5);
+            color: var(--accent-blue);
+            box-shadow: none;
+        }
+        
+        /* --- Problem List Styles --- */
+        .problem-list {
+            text-align: left;
+            width: 100%;
+            padding: 15px;
+        }
+        
+        .problem-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            /* ใช้ glass effect แบบจางๆ แทนสีแดงทึบ */
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.2);
+            padding: 16px;
+            border-radius: 20px;
+        }
+
+        .problem-item:last-child {
+            margin-bottom: 0;
+            background: rgba(255, 59, 48, 0.15); /* เน้นอันสุดท้ายเข้มขึ้นนิดนึง */
+            border-color: rgba(255, 59, 48, 0.4);
+        }
+        
+        .problem-icon {
+            font-size: 1.8rem;
+            margin-right: 16px;
+            padding-top: 2px;
+        }
+        
+        .problem-item strong {
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .problem-item small {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* --- Finance Styles --- */
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 12px;
+            font-size: 1.05rem;
+        }
+        
+        .price-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .total-price-row {
+             border-top: 1px solid rgba(255,255,255,0.1);
+             padding-top: 15px;
+             margin-top: 5px;
+        }
+
+        .total-label {
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+        .total-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            text-shadow: 0 0 10px rgba(52, 199, 89, 0.3);
+        }
+
+        .img-placeholder {
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(45deg, #222, #333);
+            border-radius: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #777;
+            /* ใช้รูป S24 Ultra จริง (แทน S25 ไปก่อน) */
+            background-image: url('https://images.samsung.com/is/image/samsung/p6pim/th/2401/gallery/th-galaxy-s24-s928-sm-s928bztqthl-539297652?$650_519_PNG$');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Q&A Section */
+        .qa-box {
+            text-align: left;
+        }
+        .question {
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .answer {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+        .answer strong {
+            color: white;
+        }
+
+        .final-btn {
+            /* Gradient ปุ่มสุดท้ายให้เด่น */
+            background: linear-gradient(90deg, #2E93FF 0%, #5AAEFF 100%);
+            font-weight: 700;
+            font-size: 1.2rem;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(46, 147, 255, 0.4);
+        }
+
+        .restart-btn {
+            margin-top: 15px;
+            font-size: 0.95rem;
+            padding: 12px;
+            opacity: 0.8;
+        }
+
+        /* Confetti */
+        .confetti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            /* ใช้สี accent ของเรา */
+            background-color: var(--accent-blue);
+            top: -10px;
+            z-index: 100;
+            animation: fall linear forwards;
+            border-radius: 4px;
+        }
+        @keyframes fall {
+            to { transform: translateY(105vh) rotate(720deg); opacity: 0;}
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="slide active" id="page1">
+        <div class="content-wrapper">
+            <h1>Project Galaxy S25 Ultra</h1>
+            <p>ข้อเสนอเพื่อการอนุมัติอัปเกรดอุปกรณ์<br>เพื่อประสิทธิภาพสูงสุด</p>
+            <div style="height: 30px;"></div>
+            <div class="card" style="text-align: center;">
+                <p style="margin-bottom: 0;">🎯 กรุณาเลือกผู้อนุมัติ:</p>
+            </div>
+        </div>
+        <div class="role-select">
+            <button class="outline" onclick="selectRole('Dad')" style="font-size: 1.2rem;">👨 คุณพ่อ</button>
+            <button class="outline" onclick="selectRole('Mom')" style="font-size: 1.2rem;">👩 คุณแม่</button>
+        </div>
+    </div>
+
+    <div class="slide" id="page2">
+        <div class="content-wrapper">
+            <h2>ทำไมถึงต้องเปลี่ยน?</h2>
+            <p>iPhone 13 Pro เครื่องปัจจุบันเริ่มมีอาการ<br>ที่กระทบต่อการใช้งานจริงครับ</p>
+            
+            <div class="card problem-list">
+                <div class="problem-item">
+                    <span class="problem-icon">🔋</span>
+                    <div>
+                        <strong>แบตเตอรี่เสื่อมสภาพ</strong>
+                        <small>หมดเร็วมากระหว่างวัน ต้องชาร์จบ่อย</small>
+                    </div>
+                </div>
+                <div class="problem-item">
+                    <span class="problem-icon">🐢</span>
+                    <div>
+                        <strong>เครื่องช้าและหน่วง</strong>
+                        <small>เปิดแอปช้า ตอบสนองไม่ทันใจ</small>
+                    </div>
+                </div>
+                <div class="problem-item">
+                    <span class="problem-icon">📱</span>
+                    <div>
+                        <strong>หน้าจอดับเอง</strong>
+                        <small>อาการเริ่มหนักขึ้น ใช้งานอยู่ดีๆ ก็ดับ</small>
+                    </div>
+                </div>
+                <div class="problem-item" style="border-color: var(--accent-red);">
+                    <span class="problem-icon">⚠️</span>
+                    <div>
+                        <strong style="color: var(--accent-red);">Critical: กล้องค้างตอนโอนเงิน <span style="font-size: 0.7em; color: var(--text-primary); font-weight: normal; opacity: 0.8;">(เป็นไม่บ่อยครับ)</span></strong>
+                        <small>สแกน QR ไม่ติด อันตรายและลำบากเวลาต้องทำธุรกรรมเร่งด่วน</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button onclick="nextSlide(3)">ไปต่อ ></button>
+    </div>
+
+    <div class="slide" id="page3">
+        <div class="content-wrapper">
+            <h2>คำถามที่ต้องเจอ?</h2>
+            <div class="img-placeholder" style="background-image: none; background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(0,0,0,0.2)); flex-direction: column; height: 180px;">
+                <span style="font-size: 4rem; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));">📱🔁📱</span>
+            </div>
+            
+            <div class="card qa-box">
+                <div class="question">Q: ซื้อใหม่แล้วเครื่องเก่าเอาไปทำอะไร? ใช้สองเครื่องหรอ?</div>
+                <div class="answer">
+                    <strong>A: ไม่ได้ใช้สองเครื่องพร่ำเพรื่อครับ</strong><br><br>
+                    เนื่องจากเครื่องเก่าเริ่มรวน (จอ/กล้อง) ขายต่ออาจได้ราคาไม่ดี ผมวางแผนไว้ 2 ทางเลือกครับ:
+                    <br><br>
+                    ✅ <strong>ทางที่ 1: เก็บเป็น Backup</strong> เอาไว้ใช้สำรองข้อมูล, เป็น Hotspot ฉุกเฉิน หรือใช้ในที่เสี่ยง (เช่น ตอนไปออกกำลังกาย) แทนเครื่องใหม่
+                    <br><br>
+                    ✅ <strong>ทางที่ 2: Trade-in</strong> (ถ้าพ่อ/แม่เห็นด้วย) ลองเช็คราคาเทิร์น เพื่อนำมาเป็นส่วนลด S25 Ultra เพิ่มเติมครับ
+                </div>
+            </div>
+        </div>
+        <button onclick="nextSlide(4)">ดูแผนการเงิน 💰</button>
+    </div>
+
+    <div class="slide" id="page4">
+        <div class="content-wrapper">
+            <h2>Financial Plan</h2>
+            <p>ดีลนี้คุ้มค่าและผ่อนสบายที่สุด ณ ตอนนี้ครับ</p>
+
+            <div class="img-placeholder">
+                </div>
+
+            <div class="card">
+                <div style="margin-bottom: 15px; font-weight: 600; color: var(--accent-blue);">📱 ค่าเครื่อง (โปรโมชั่น)</div>
+                <div class="price-row">
+                    <span style="color: var(--text-secondary);">ราคาเต็ม</span>
+                    <span style="text-decoration: line-through; color: var(--text-secondary);">4x,xxx บาท</span>
+                </div>
+                <div class="price-row">
+                    <span>ราคาพิเศษ</span>
+                    <span style="font-weight: 600;">32,100 บาท</span>
+                </div>
+                <div class="price-row">
+                    <span>ระยะเวลาผ่อน (0%)</span>
+                    <span>10 เดือน</span>
+                </div>
+                <div class="price-row total-price-row" style="border-bottom: none;">
+                    <span class="total-label">✨ ตกเดือนละ</span>
+                    <span class="total-value">3,210 บาท</span>
+                </div>
+            </div>
+
+            <div class="card" style="background: rgba(46, 147, 255, 0.1);">
+                <h3 style="margin: 0 0 15px 0; font-size: 1.1rem; color: var(--accent-blue);">🌐 ค่าบริการรายเดือน (AIS)</h3>
+                <div class="price-row">
+                    <span>แพ็กเกจ 5G Max Speed</span>
+                    <span>699 บาท/เดือน</span>
+                </div>
+                <div class="price-row" style="border-bottom: none;">
+                    <span>สัญญาการใช้งาน</span>
+                    <span>12 เดือน</span>
+                </div>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: -10px;">*ราคารายเดือนยังไม่รวม VAT 7%</p>
+        </div>
+
+        <button onclick="nextSlide(5)">สรุปและขออนุมัติ ></button>
+    </div>
+
+    <div class="slide" id="page5">
+        <div class="content-wrapper">
+            <div style="font-size: 5rem; margin-bottom: 20px;">🙏</div>
+            <h1>บทสรุปการลงทุน</h1>
+            <p>เพื่อความปลอดภัยในการทำธุรกรรม<br>และการใช้งานที่ลื่นไหลในอีก 3-4 ปีข้างหน้าครับ</p>
+            
+            <div class="card" style="text-align: center; border: 2px solid var(--accent-green); background: rgba(52, 199, 89, 0.1);">
+                <p style="margin-bottom: 10px; color: var(--accent-green); font-weight: 600;">ยอดผ่อนชำระสุทธิต่อเดือน</p>
+                <span style="font-size: 2.5rem; font-weight: 800; color: var(--accent-green); text-shadow: 0 0 15px rgba(52, 199, 89, 0.4);">3,210 บาท</span>
+                <p style="margin-top: 5px; margin-bottom: 0;">(นาน 10 เดือน)</p>
+            </div>
+        </div>
+
+        <div style="width: 100%;">
+            <button id="approveBtn" class="final-btn" onclick="celebrate()">อนุมัติครับ ...</button>
+            <button class="outline restart-btn" onclick="location.reload()">⬅️ ขอกลับไปคิดดูก่อน (เริ่มใหม่)</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Prevent rubber-banding scroll on iOS
+    document.body.addEventListener('touchmove', function(e) {
+        if (e.target.closest('.container')) return;
+        e.preventDefault();
+    }, { passive: false });
+
+    let selectedParent = '';
+
+    function selectRole(role) {
+        selectedParent = role;
+        const btnText = role === 'Dad' ? 'คุณพ่อ' : 'คุณแม่';
+        document.getElementById('approveBtn').innerText = `✅ อนุมัติครับ ${btnText}`;
+        
+        setTimeout(() => {
+             nextSlide(2);
+        }, 200); // Add slight delay for button press effect
+       
+    }
+
+    function nextSlide(pageNumber) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById('page' + pageNumber).classList.add('active');
+    }
+
+    function celebrate() {
+        // Haptic feedback pattern (if supported by browser/device)
+        if (navigator.vibrate) {
+            navigator.vibrate([100, 50, 100, 50, 200]);
+        }
+
+        for(let i=0; i<80; i++) {
+            createConfetti();
+        }
+        const approveBtn = document.getElementById('approveBtn');
+        approveBtn.innerText = "ขอบคุณครับ! ❤️ รักที่สุด";
+        approveBtn.style.background = "linear-gradient(90deg, #34C759 0%, #30B350 100%)";
+        approveBtn.style.boxShadow = "0 10px 30px rgba(52, 199, 89, 0.5)";
+        approveBtn.disabled = true; // Prevent multiple clicks
+        
+        // Hide restart button
+        document.querySelector('.restart-btn').style.display = 'none';
+
+        setTimeout(() => {
+            alert("ขอบคุณที่อนุมัติครับ! สัญญาว่าจะตั้งใจใช้งานให้คุ้มค่าที่สุดครับ 🙏");
+        }, 800);
+    }
+
+    function createConfetti() {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
+        confetti.style.opacity = Math.random();
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        
+        // Randomize colors (Blue, Green, Gold)
+        const colors = ['#2E93FF', '#34C759', '#FFD700', '#ffffff'];
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        document.body.appendChild(confetti);
+        
+        setTimeout(() => {
+            confetti.remove();
+        }, 4000);
+    }
+</script>
+
+</body>
+</html>
