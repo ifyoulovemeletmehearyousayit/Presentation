@@ -8,215 +8,99 @@
     <style>
         :root {
             --primary-bg: #000000;
-            --accent-blue: #007AFF; /* iOS Blue */
-            --accent-green: #34C759; /* iOS Green */
-            --accent-red: #FF3B30;   /* iOS Red */
+            --accent-blue: #007AFF;
+            --accent-green: #34C759;
+            --accent-red: #FF3B30;
             --text-primary: #FFFFFF;
-            --text-secondary: #8E8E93;
             --glass-bg: rgba(28, 28, 30, 0.65);
             --glass-border: rgba(255, 255, 255, 0.12);
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: 'Prompt', -apple-system, sans-serif;
-            background-color: var(--primary-bg);
             background: radial-gradient(120% 100% at top left, #1c1c1e 0%, #000000 100%);
             color: var(--text-primary);
-            overflow: hidden; /* ห้าม scroll ที่ body */
-            
-            /* ใช้ dvh เพื่อให้เต็มจอ iPhone พอดีเป๊ะ ไม่โดน Address bar บัง */
-            height: 100dvh; 
-            width: 100vw;
-            
-            /* ป้องกันการเลือก text (ให้ฟีลเหมือน App) */
-            user-select: none;
-            -webkit-user-select: none;
+            overflow: hidden;
+            height: 100dvh; width: 100vw;
+            user-select: none; -webkit-user-select: none;
         }
 
-        .container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
+        .container { width: 100%; height: 100%; position: relative; }
 
         .slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            
-            /* Layout แบบ Flexbox แนวตั้ง */
-            display: flex;
-            flex-direction: column;
-            
-            /* Padding หลบติ่งจอและ Bar ด้านล่าง */
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
             padding-top: calc(20px + env(safe-area-inset-top));
             padding-bottom: calc(20px + env(safe-area-inset-bottom));
-            padding-left: 24px;
-            padding-right: 24px;
-            
-            opacity: 0;
-            pointer-events: none;
+            padding-left: 24px; padding-right: 24px;
+            opacity: 0; pointer-events: none;
             transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
             transform: scale(0.95);
         }
 
-        .slide.active {
-            opacity: 1;
-            pointer-events: auto;
-            transform: scale(1);
-        }
+        .slide.active { opacity: 1; pointer-events: auto; transform: scale(1); }
 
-        /* --- Header Section (บนสุด) --- */
-        .header-section {
-            flex: 0 0 auto; /* ไม่ยืดหด */
-            text-align: center;
-            margin-bottom: 10px;
-        }
+        .header-section { flex: 0 0 auto; text-align: center; margin-bottom: 10px; }
+        h1 { font-size: clamp(1.8rem, 5vw, 2.2rem); font-weight: 700; margin: 0 0 5px 0; background: linear-gradient(180deg, #fff, #b0b0b0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: clamp(1.4rem, 4vw, 1.8rem); margin: 0 0 15px 0; color: var(--text-primary); }
+        p.subtitle { font-size: 0.95rem; color: #8E8E93; margin: 0; }
 
-        h1 {
-            font-size: clamp(1.8rem, 5vw, 2.2rem); /* ปรับขนาดตามความกว้างจอ */
-            font-weight: 700;
-            margin: 0 0 5px 0;
-            background: linear-gradient(180deg, #fff, #b0b0b0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        h2 {
-            font-size: clamp(1.4rem, 4vw, 1.8rem);
-            margin: 0 0 15px 0;
-            color: var(--text-primary);
-        }
-
-        p.subtitle {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            margin: 0;
-        }
-
-        /* --- Middle Content (ส่วนเนื้อหาตรงกลาง) --- */
         .content-area {
-            flex: 1 1 auto; /* ยืดจนเต็มพื้นที่ว่าง */
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* จัดกึ่งกลางแนวตั้ง */
-            overflow-y: auto; /* ถ้าเนื้อหายาวเกิน ให้เลื่อนเฉพาะตรงนี้ */
-            
-            /* ซ่อน Scrollbar ให้สวยงาม */
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center;
+            overflow-y: auto; -ms-overflow-style: none; scrollbar-width: none;
         }
-        .content-area::-webkit-scrollbar {
-            display: none;
-        }
+        .content-area::-webkit-scrollbar { display: none; }
 
-        /* --- Bottom Action (ส่วนปุ่มด้านล่าง) --- */
-        .action-area {
-            flex: 0 0 auto; /* ไม่ยืดหด ติดด้านล่างเสมอ */
-            padding-top: 15px;
-            width: 100%;
-        }
+        .action-area { flex: 0 0 auto; padding-top: 15px; width: 100%; }
 
-        /* --- Cards UI --- */
         .card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            border-radius: 22px;
-            padding: 20px;
-            width: 100%;
-            margin-bottom: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); border-radius: 22px; padding: 20px;
+            width: 100%; margin-bottom: 15px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
-        /* --- Button Style --- */
         button {
-            background: var(--accent-blue);
-            color: white;
-            border: none;
-            padding: 16px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 16px; /* ทรงเหลี่ยมมนสไตล์ iOS ใหม่ */
-            cursor: pointer;
-            width: 100%;
-            transition: transform 0.1s;
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            background: var(--accent-blue); color: white; border: none; padding: 16px;
+            font-size: 1.1rem; font-weight: 600; border-radius: 16px; cursor: pointer;
+            width: 100%; transition: transform 0.1s; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
         }
-        button:active {
-            transform: scale(0.96);
-            opacity: 0.8;
-        }
-        button.outline {
-            background: rgba(255,255,255,0.08);
-            color: var(--accent-blue);
-            box-shadow: none;
-            margin-bottom: 10px;
-        }
+        button:active { transform: scale(0.96); opacity: 0.8; }
+        button.outline { background: rgba(255,255,255,0.08); color: var(--accent-blue); box-shadow: none; margin-bottom: 10px; }
 
-        /* --- Specific Elements --- */
-        .problem-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .problem-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        .problem-icon {
-            font-size: 1.5rem;
-            margin-right: 12px;
-            min-width: 30px;
-        }
+        .problem-item { display: flex; align-items: flex-start; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .problem-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .problem-icon { font-size: 1.5rem; margin-right: 12px; min-width: 30px; }
 
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 1rem;
-        }
-        .total-highlight {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--accent-green);
-            margin-top: 5px;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
+        .price-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 1rem; }
+        .total-highlight { font-size: 1.3rem; font-weight: 700; color: var(--accent-green); margin-top: 5px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
 
+        /* แก้ไขส่วนรูปภาพ: ใช้ URL ที่เสถียรขึ้น และปรับ sizing */
         .img-box {
-            height: 180px; /* Fix ความสูงรูปให้พอดีมือถือ */
-            background-color: #333;
+            height: 200px;
+            background-color: #222;
             border-radius: 18px;
             margin-bottom: 15px;
-            background-image: url('https://images.samsung.com/is/image/samsung/p6pim/th/2401/gallery/th-galaxy-s24-s928-sm-s928bztqthl-539297652?$650_519_PNG$');
-            background-size: contain;
+            /* รูป S24 Ultra Titanium Gray (Wikipedia Server) */
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Samsung_Galaxy_S24_Ultra.jpg/640px-Samsung_Galaxy_S24_Ultra.jpg');
+            background-size: cover; /* ปรับเป็น cover ให้เต็มกรอบ */
             background-position: center;
             background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* เพิ่มเงาดำๆ ด้านล่างรูปเพื่อให้ตัวหนังสืออ่านง่ายถ้าซ้อนทับ */
+        .img-box::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 40%;
+            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
         }
 
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: var(--accent-blue);
-            z-index: 999;
-        }
-
+        .confetti { position: absolute; width: 10px; height: 10px; background-color: var(--accent-blue); z-index: 999; }
     </style>
 </head>
 <body>
@@ -287,14 +171,11 @@
             <h2>เครื่องเก่าทำไง? 🤔</h2>
         </div>
         <div class="content-area">
-            <div class="img-box" style="background-image: none; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center;">
-                <span style="font-size: 3rem;">♻️</span>
+            <div class="img-box" style="background-image: none; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; height: 150px;">
+                <span style="font-size: 4rem;">♻️</span>
             </div>
             <div class="card">
                 <p style="margin-bottom: 15px;"><strong>Q: ซื้อแล้วใช้ 2 เครื่องหรอ?</strong></p>
-                <p style="color: #ccc; line-height: 1.5;">
-                    <strong>A: ไม่ครับ</strong> เครื่องเก่าเริ่มรวน ผมวางแผนไว้ 2 ทาง:
-                </p>
                 <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin-bottom: 8px;">
                     1. <strong>Backup/Emergency:</strong> ไว้สำรองข้อมูล หรือใช้ตอนออกกำลังกาย
                 </div>
@@ -313,7 +194,7 @@
             <h2>Financial Plan 📊</h2>
         </div>
         <div class="content-area">
-            <div class="img-box"></div>
+            <div class="img-box"></div> 
             
             <div class="card">
                 <div class="price-row">
@@ -382,12 +263,11 @@
     function celebrate() {
         const btn = document.getElementById('approveBtn');
         btn.innerText = "ขอบคุณครับ! ❤️";
-        btn.style.background = "#34C759"; // iOS Green
+        btn.style.background = "#34C759";
         btn.disabled = true;
 
         if (navigator.vibrate) navigator.vibrate([50, 50, 100]);
         
-        // Confetti Logic
         for(let i=0; i<60; i++) {
             const confetti = document.createElement('div');
             confetti.className = 'confetti';
